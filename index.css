@@ -1,184 +1,274 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-body {
-  font-family: "Roboto", Arial, Helvetica, sans-serif;
-  margin: 0;
-  background: #111;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+<title>Vanta</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.2.0/css/all.css">
+
+<style>
+:root {
+    --sidebar-width: 60px;
+    --theme-primary: #1a237e;
 }
 
-.fa-magnifying-glass {
-  color: white;
+/* =========================
+   BASE RESET
+========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.flex-center {
-  display: flex;
-  justify-content: center;
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+    font-family: 'Inter', sans-serif;
+    background: transparent;
 }
 
-.header-center {
-  align-items: center;
-  flex-direction: column;
-  margin-top: 10%;
+/* =========================
+   VANTA BACKGROUND
+========================= */
+#vanta-fog-container {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
 }
 
-.left-margin {
-  margin: 0px 16px;
+/* =========================
+   SIDEBAR
+========================= */
+.sidebar {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    bottom: 8px;
+    width: var(--sidebar-width);
+    background: rgba(10, 15, 50, 0.95);
+    border-radius: 22px;
+    box-shadow:
+        0 0 40px rgba(26,35,126,0.35),
+        inset 0 0 20px rgba(26,35,126,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 18px 0;
+    z-index: 1000;
 }
+
+.logo-container {
+    width: 45px;
+    height: 45px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: rgba(26,35,126,0.12);
+}
+
+.logo-container img {
+    width: 32px;
+    height: 32px;
+}
+
+.nav-group, .bottom-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-item {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: #1a237e6b;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    transition: .25s ease;
+}
+
+.nav-item i {
+    font-size: 20px;
+    color: white;
+}
+
+.nav-item:hover {
+    transform: scale(1.07);
+    box-shadow: 0 0 12px rgba(26,35,126,0.5);
+}
+
+.spacer { flex: 1; }
+
+/* =========================
+   CENTER SEARCH
+========================= */
+.main-center {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: calc(var(--sidebar-width) + 40px);
+}
+
+.search-wrapper {
+    width: min(520px, 90%);
+    display: flex;
+    align-items: center;
+    background: rgba(20, 28, 90, 0.78);
+    border-radius: 22px;
+    padding: 16px 22px;
+    box-shadow:
+        0 0 28px rgba(26,35,126,0.4),
+        inset 0 0 18px rgba(26,35,126,0.18);
+    backdrop-filter: blur(12px);
+}
+
+.search-wrapper i {
+    color: #b9c0ff;
+    font-size: 18px;
+    margin-right: 14px;
+}
+
+.search-wrapper input[type="text"] {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 16px;
+}
+
+.search-wrapper input::placeholder {
+    color: rgba(190,198,255,0.65);
+}
+
+.search-error {
+    color: #ffb4b4;
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* =========================
+   ULTRAVIOLET REQUIRED
+========================= */
 
 #uv-frame {
-  border: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: #111;
+    border: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #111;
+    z-index: 2000;
+    display: none;
 }
 
 #uv-error {
-  color: #ff6666 !important;
-  white-space: pre-wrap;
+    color: #ff6666 !important;
+    white-space: pre-wrap;
 }
 
 #uv-error-code {
-  font-size: 12px;
-  color: #fff;
-  font-family: "Courier New", Courier, monospace;
+    font-size: 12px;
+    color: #fff;
+    font-family: "Courier New", Courier, monospace;
 }
+</style>
 
-#uv-register-sw {
-  color: white;
-  background: #555555;
-  cursor: pointer;
-  outline: none;
-  border: none;
-  border-radius: 6px;
-  padding: 16px 20px;
-  line-height: 16px;
-  display: none;
-}
+<!-- VANTA -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.fog.min.js"></script>
 
-#uv-register-sw:active {
-  background: #333333;
-}
+<!-- ULTRAVIOLET CORE (ORDER MATTERS) -->
+<script src="baremux/index.js" defer></script>
+<script src="epoxy/index.js" defer></script>
+<script src="uv/uv.bundle.js" defer></script>
+<script src="uv/uv.config.js" defer></script>
+<script src="register-sw.js" defer></script>
+<script src="search.js" defer></script>
+<script src="index.js" defer></script>
 
-#uv-register-sw.show {
-  display: block;
-}
+</head>
 
-.logo {
-  width: 150px;
-  height: 150px;
-}
+<body>
 
-.logo-wrapper .text {
-  font-size: 75px;
-  color: #fff;
-}
+<nav class="sidebar">
+    <a class="logo-container">
+        <img src="voltage.svg" alt="Logo">
+    </a>
 
-.logo-wrapper h1 {
-  color: white;
-}
+    <div class="nav-group">
+        <a href="/" class="nav-item"><i class="fa-solid fa-house"></i></a>
+        <a href="/g.html" class="nav-item"><i class="fa-solid fa-gamepad"></i></a>
+        <a href="/a.html" class="nav-item"><i class="fa-solid fa-th-large"></i></a>
+        <a href="/t.html" class="nav-item"><i class="fa-solid fa-robot"></i></a>
+    </div>
 
-footer {
-  margin: 0 5vw;
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  line-height: 30px;
-  margin-bottom: 20px;
-}
+    <div class="spacer"></div>
 
-footer > div {
-  display: flex;
-  justify-content: left;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
-}
+    <div class="bottom-group">
+        <a href="/s.html" class="nav-item"><i class="fa-solid fa-gear"></i></a>
+    </div>
+</nav>
 
-footer a,
-footer span {
-  margin: 0 15px;
-  text-decoration: none;
-  color: #fff;
-  font-size: 15px;
-}
+<div id="vanta-fog-container"></div>
 
-footer a {
-  cursor: pointer;
-}
+<div class="main-center">
+    <div>
+        <form id="uv-form" class="search-wrapper">
+            <input id="uv-search-engine"
+                   value="https://www.google.com/search?q=%s"
+                   type="hidden" />
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="uv-address"
+                   type="text"
+                   placeholder="Search The Web"
+                   autocomplete="off" />
+        </form>
 
-footer a:hover {
-  text-decoration: underline;
-}
+        <div class="search-error">
+            <p id="uv-error"></p>
+            <pre id="uv-error-code"></pre>
+        </div>
+    </div>
+</div>
 
-.desc p {
-  width: 560px;
-  color: rgba(253, 253, 253, 0.514);
-}
+<iframe id="uv-frame"></iframe>
 
-#uv-address {
-  background: none;
-  font-family: inherit;
-  padding: 0px 17px;
-  height: 48px;
-  border: 1px solid rgb(255, 255, 255, 0.2);
-  color: var(--text-color);
-  border-radius: 3px;
-  outline: none;
-  width: 350px;
-  margin-top: 5px;
-  border-radius: 50px;
-  color: #fff;
-  transition: border-radius 0.1s;
-}
+<script>
+VANTA.FOG({
+    el: "#vanta-fog-container",
+    mouseControls: true,
+    touchControls: true,
+    highlightColor: 0x1a237e,
+    midtoneColor: 0x0b0f2e,
+    lowlightColor: 0x0f1240,
+    baseColor: 0x050923,
+    blurFactor: 0.9,
+    speed: 0.7,
+    zoom: 0.9
+});
 
-#uv-address:focus {
-  border: 1px solid rgba(253, 253, 253, 0.514);
-  border-radius: 6px;
-}
+/* Show proxy when searching */
+document.getElementById("uv-form").addEventListener("submit", function() {
+    setTimeout(() => {
+        document.getElementById("uv-frame").style.display = "block";
+    }, 400);
+});
+</script>
 
-.credit {
-  border-radius: 10px;
-  padding: 10px;
-  display: block;
-  border: #fff 1px solid;
-  color: #fff;
-  display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
-}
-
-.credit label {
-  margin-left: auto;
-  margin-right: 15px;
-}
-
-.credit a,
-.credit label {
-  color: white;
-  text-decoration: underline;
-  text-align: right;
-}
-
-.credit pre {
-  display: none;
-  width: 100%;
-}
-
-.credit label::after {
-  content: "show license";
-  cursor: pointer;
-}
-
-.credit input:checked + label::after {
-  content: "hide license";
-}
-
-.credit input:checked ~ pre {
-  display: block;
-}
+</body>
+</html>
